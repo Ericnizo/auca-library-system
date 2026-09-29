@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AUCA Library Management System</title>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#edf2f0;--card:#fff;--ink:#12241f;--muted:#566c65;--line:#d3ddd9;--brand:#14483c;--on:#fff;--gold:#c98a0b;--ok:#1f7a4d;--bad:#b3261e;--warn:#9a6700;--soft:#f4f8f6;
+--head:'Schibsted Grotesk','Trebuchet MS',sans-serif;--body:system-ui,-apple-system,'Segoe UI',sans-serif;--mono:ui-monospace,Menlo,Consolas,monospace;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1a17;--card:#152722;--ink:#e6f1ed;--muted:#9bb5ac;--line:#25403a;--brand:#4fc3a1;--on:#08201a;--gold:#f0b44a;--ok:#5fd394;--bad:#ff8b80;--warn:#f0b44a;--soft:#1a2f29}}
+:root[data-theme="dark"]{--bg:#0d1a17;--card:#152722;--ink:#e6f1ed;--muted:#9bb5ac;--line:#25403a;--brand:#4fc3a1;--on:#08201a;--gold:#f0b44a;--ok:#5fd394;--bad:#ff8b80;--warn:#f0b44a;--soft:#1a2f29}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);line-height:1.5;min-height:100vh}
+h1,h2,h3{font-family:var(--head);line-height:1.15}
+button{font:inherit;cursor:pointer;color:inherit;background:none;border:0}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+header{background:var(--brand);color:var(--on);padding:.9rem 1rem}
+.bar{max-width:1100px;margin:0 auto;display:flex;flex-wrap:wrap;gap:.8rem 1.5rem;align-items:center;justify-content:space-between}
+.bar h1{font-size:1.3rem;font-weight:800}
+.bar h1 small{display:block;font-size:.75rem;font-weight:500;opacity:.8}
+.clock{display:flex;gap:.4rem;align-items:center;font-size:.85rem;flex-wrap:wrap}
+.clock button{border:1.5px solid currentColor;border-radius:6px;padding:.2rem .55rem;font-family:var(--head);font-weight:700;font-size:.8rem}
+nav{max-width:1100px;margin:0 auto;display:flex;gap:.3rem;padding:.7rem 1rem 0;overflow-x:auto}
+nav button{font-family:var(--head);font-weight:700;padding:.55rem 1rem;border-radius:8px 8px 0 0;border:1px solid var(--line);border-bottom:0;background:var(--soft);white-space:nowrap}
+nav button[aria-current="page"]{background:var(--card);border-top:3px solid var(--gold)}
+main{max-width:1100px;margin:0 auto;padding:0 1rem 3rem}
+.pane{background:var(--card);border:1px solid var(--line);padding:1.2rem;border-radius:0 12px 12px 12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:1rem}
+.box{border:1px solid var(--line);border-radius:10px;padding:1rem;background:var(--card)}
+.box h2{font-size:1.1rem;margin-bottom:.2rem}
+.box>p.sub{color:var(--muted);font-size:.85rem;margin-bottom:.6rem}
+label{display:block;font-family:var(--head);font-weight:700;font-size:.82rem;margin:.7rem 0 .2rem}
+input,select{width:100%;font:inherit;padding:.55rem .65rem;border:2px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
+input:focus{border-color:var(--brand);outline:none}
+.mono{font-family:var(--mono)}
+.btn{font-family:var(--head);font-weight:700;background:var(--brand);color:var(--on);padding:.6rem 1.1rem;border-radius:8px;margin-top:.9rem}
+.btn.s{margin:0;padding:.25rem .6rem;font-size:.8rem}
+.btn.o{background:none;color:var(--brand);border:1.5px solid var(--brand)}
+.res{margin-top:.8rem;padding:.6rem .8rem;border-radius:8px;font-size:.9rem;border-left:5px solid}
+.res.ok{border-color:var(--ok);background:var(--soft)}
+.res.err{border-color:var(--bad);background:var(--soft)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}
+h2.sec{font-size:1.15rem;margin:1.6rem 0 .6rem}
+h2.sec:first-child{margin-top:0}
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.88rem}
+th,td{text-align:left;padding:.5rem .6rem;border-bottom:1px solid var(--line);vertical-align:middle}
+th{font-family:var(--head);color:var(--muted);font-size:.78rem}
+.pill{font-family:var(--head);font-weight:700;font-size:.72rem;padding:.1rem .55rem;border-radius:999px;border:1.5px solid currentColor;white-space:nowrap}
+.Active,.Available,.Fulfilled,.Paid{color:var(--ok)}
+.Suspended,.Reserved,.Notified,.Waiting{color:var(--warn)}
+.Cancelled,.Expired,.Overdue,.Unpaid{color:var(--bad)}
+.onloan{color:var(--muted)}
+.card{display:inline-block;border:2px solid var(--brand);border-radius:12px;padding:1rem 1.2rem;background:var(--card);margin:.8rem 0}
+.card b{font-family:var(--head);font-size:1.1rem}
+.card svg{display:block;margin-top:.5rem;background:#fff;padding:4px;border-radius:4px}
+.muted{color:var(--muted);font-size:.85rem}
+.tag{font-family:var(--head);font-weight:700;font-size:.75rem;color:var(--muted)}
+.note{border-top:1px solid var(--line);padding:.5rem 0;font-size:.88rem}
+.note:first-child{border-top:0}
+@media(max-width:600px){.row2{grid-template-columns:1fr}}
+header{position:sticky;top:0;z-index:20;padding:.7rem 1rem}
+.brand{display:flex;align-items:center;gap:.7rem;text-align:left;color:var(--on)}
+.brand .logo{font-size:1.6rem}
+.brand b{font-family:var(--head);font-weight:800;font-size:1.25rem;display:block;line-height:1.1}
+.brand small{font-size:.72rem;opacity:.8}
+#top{display:flex;gap:.3rem;align-items:center;flex-wrap:wrap;padding:0;max-width:none;overflow:visible;margin:0}
+#top button{font-family:var(--head);font-weight:700;padding:.5rem .9rem;border-radius:999px;background:none;border:0;color:var(--on);opacity:.85}
+#top button:hover{opacity:1}
+#top button[aria-current="page"]{opacity:1;box-shadow:inset 0 -3px 0 var(--gold);border-radius:6px 6px 0 0}
+#top button.cta{background:var(--gold);color:#12241f;opacity:1;margin-left:.4rem}
+#top button.cta[aria-current="page"]{box-shadow:0 0 0 3px rgba(255,255,255,.5);border-radius:999px}
+.sysbar{background:var(--card);border-bottom:1px solid var(--line);margin-bottom:0}
+.sysbar .clock{max-width:1100px;margin:0 auto;padding:.6rem 1rem 0;color:var(--muted)}
+.sysbar nav{padding-bottom:0}
+.free{padding-top:1.4rem}
+.hero{background:var(--brand);color:var(--on);border-radius:18px;padding:2.4rem 2rem 0;display:grid;grid-template-columns:1.1fr 1fr;gap:2rem;align-items:end;overflow:hidden}
+.hero h1{font-size:clamp(2.1rem,5vw,3.5rem);font-weight:800;letter-spacing:-.02em;margin-bottom:1rem}
+.hero p{font-size:1.1rem;max-width:46ch;opacity:.92}
+.hbtn{display:flex;gap:.7rem;flex-wrap:wrap;margin:1.5rem 0 2.4rem}
+.hbtn .btn{margin:0;padding:.8rem 1.3rem}
+.btn.gold{background:var(--gold);color:#12241f}
+.btn.ghost{background:none;color:var(--on);border:2px solid currentColor}
+.shelf{display:flex;align-items:flex-end;gap:5px;height:230px;border-bottom:10px solid rgba(0,0,0,.28);padding:0 .3rem}
+.shelf i{display:block;border-radius:4px 4px 0 0;position:relative;flex:1;max-width:34px}
+.shelf i::after{content:"";position:absolute;left:18%;right:18%;top:14%;height:3px;background:rgba(0,0,0,.28);box-shadow:0 8px 0 rgba(0,0,0,.2)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin:1.2rem 0}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1.1rem 1.2rem;border-left:6px solid var(--gold)}
+.stat b{font-family:var(--head);font-size:2.3rem;font-weight:800;display:block;line-height:1}
+.stat span{color:var(--muted);font-size:.9rem}
+.feats{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1rem}
+.feat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1.2rem}
+.feat .ic{font-size:1.7rem;display:block;margin-bottom:.4rem}
+.feat h3{font-size:1.05rem;margin-bottom:.3rem}
+.feat p{color:var(--muted);font-size:.92rem}
+.h2{font-family:var(--head);font-size:1.6rem;font-weight:800;margin:2rem 0 .8rem}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;align-items:start}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1.4rem}
+.panel p{margin-bottom:.7rem;max-width:62ch}
+.steps{list-style:none;counter-reset:s}
+.steps li{counter-increment:s;display:flex;gap:.8rem;padding:.6rem 0;border-top:1px solid var(--line)}
+.steps li:first-child{border-top:0}
+.steps li::before{content:counter(s);flex:none;width:1.9rem;height:1.9rem;border-radius:50%;background:var(--brand);color:var(--on);font-family:var(--head);font-weight:800;display:flex;align-items:center;justify-content:center}
+.rules td:last-child{font-family:var(--head);font-weight:800;text-align:right}
+footer{max-width:1100px;margin:0 auto;padding:1.5rem 1rem 2.5rem;color:var(--muted);font-size:.85rem;display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+@media(max-width:760px){.hero,.two{grid-template-columns:1fr}.hero{padding:1.6rem 1.2rem 0}.shelf{height:150px}}
+
+:root{--bgimg:url("data:image/jpeg;base64,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");--ov1:rgba(14,58,48,.95);--ov2:rgba(14,58,48,.84);--ov3:rgba(14,58,48,.5)}
+body::before{content:"";position:fixed;inset:0;background:var(--bgimg) center/cover no-repeat;opacity:.09;z-index:-1;pointer-events:none}
+.hero{background:linear-gradient(90deg,var(--ov1) 0%,var(--ov2) 50%,var(--ov3) 100%),var(--bgimg) center/cover no-repeat;color:#fff}
+.hero h1,.hero p{color:#fff}
+.hero .btn.ghost{color:#fff}
+@media(max-width:760px){.hero{background:linear-gradient(180deg,var(--ov1) 0%,var(--ov2) 100%),var(--bgimg) center/cover no-repeat}}
+
+.login-screen{min-height:100vh;display:grid;place-items:center;padding:1.25rem;background:linear-gradient(135deg,rgba(14,58,48,.94),rgba(14,58,48,.72)),var(--bgimg) center/cover fixed}
+.login-card{width:min(100%,440px);background:var(--card);color:var(--ink);padding:2rem;border-radius:20px;box-shadow:0 24px 70px rgba(0,0,0,.24);border:1px solid var(--line)}
+.login-mark{width:58px;height:58px;display:grid;place-items:center;border-radius:16px;background:var(--brand);color:var(--on);font-size:1.8rem;margin-bottom:1rem}
+.login-card h1{font-size:1.8rem;margin-bottom:.45rem}.login-card .muted{margin-bottom:1rem}.login-card .btn{width:100%;padding:.8rem;margin-top:1.1rem}
+.login-note{font-size:.78rem;color:var(--muted);margin-top:1rem;border-top:1px solid var(--line);padding-top:.8rem}
+.login-error{color:var(--bad);font-size:.88rem;margin-top:.7rem;display:none}
+.logout-btn{border:1px solid currentColor!important}
+@media(max-width:500px){.login-card{padding:1.4rem}}
+</style>
+</head>
+<body>
+<header><div class="bar">
+<button class="brand" data-page="home" aria-label="AUCA Library home"><span class="logo" aria-hidden="true">📖</span><span><b>AUCA Library</b><small>Management System</small></span></button>
+<nav id="top" aria-label="Main"></nav></div></header>
+<div class="sysbar" id="sysbar"><div class="clock" id="clock"></div><nav id="tabs" aria-label="Librarian sections"></nav></div>
+<main><div id="view"></div></main>
+<footer><span>AUCA Library Management System</span><span>Built from requirements REQ-01 to REQ-25</span></footer>
+
+<script>
+/* ===== Settings (assumptions flagged in the report) ===== */
+var LOAN_DAYS=14, FINE_PER_DAY=100, CANCEL_DAYS=14, WEEK=7;
+
+/* ===== Data ===== */
+var DB, KEY='auca-library-v1';
+function d10(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function today(){return d10(new Date(Date.now()+((DB&&DB.off)||0)*864e5))}
+function addDays(s,n){var d=new Date(s+'T12:00:00');d.setDate(d.getDate()+n);return d10(d)}
+function diff(a,b){return Math.round((new Date(b+'T12:00:00')-new Date(a+'T12:00:00'))/864e5)}
+function fmt(s){return new Date(s+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}
+function esc(t){var d=document.createElement('div');d.textContent=t==null?'':String(t);return d.innerHTML}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(DB))}catch(e){}}
+function load(){try{var r=localStorage.getItem(KEY);if(r){DB=JSON.parse(r);return}}catch(e){}seed()}
+function ok(t){return {ok:true,text:t}}
+function bad(t){return {ok:false,text:t}}
+
+/* REQ-01, REQ-02 */
+function addMember(o){
+  var n=DB.members.length;
+  var m={id:'M-'+(1001+n),card:'C-'+(1001+n),name:o.name,address:o.address,tel:o.tel,start:o.start,expiry:o.expiry,cancelled:false};
+  DB.members.push(m);return m;
+}
+/* REQ-06, REQ-07 */
+function addCopy(isbn){
+  var no=DB.copies.filter(function(c){return c.isbn===isbn}).length+1;
+  var c={barcode:'BC-'+String(DB.copies.length+1).padStart(5,'0'),isbn:isbn,no:no,status:'Available'};
+  DB.copies.push(c);return c;
+}
+function addBook(o,n){DB.books.push({title:o.title,author:o.author,isbn:o.isbn,publisher:o.publisher,year:o.year});for(var i=0;i<n;i++)addCopy(o.isbn)}
+function seed(){
+  DB={off:0,last:'',members:[],books:[],copies:[],loans:[],res:[],fines:[],notes:[]};
+  DB.last=today();var t=today();
+  addMember({name:'Alice Uwase',address:'Kigali',tel:'0788000001',start:t,expiry:addDays(t,365)});
+  addMember({name:'Jean Mugabo',address:'Kicukiro, Kigali',tel:'0788000002',start:t,expiry:addDays(t,365)});
+  addBook({title:'Database Systems',author:'Elmasri & Navathe',isbn:'978-0-13-397077-7',publisher:'Pearson',year:2015},2);
+  addBook({title:'Operating System Concepts',author:'Silberschatz, Galvin & Gagne',isbn:'978-1-119-32091-3',publisher:'Wiley',year:2018},1);
+  addBook({title:'Computer Networks',author:'Andrew S. Tanenbaum',isbn:'978-0-13-212695-3',publisher:'Pearson',year:2011},1);
+  save();
+}
+function mem(id){return DB.members.find(function(m){return m.id===id})}
+function byCard(c){c=String(c||'').trim().toUpperCase();return DB.members.find(function(m){return m.card===c})}
+function copy(b){b=String(b||'').trim().toUpperCase();return DB.copies.find(function(c){return c.barcode===b})}
+function book(isbn){return DB.books.find(function(b){return b.isbn===isbn})}
+function unpaid(mid){return DB.fines.filter(function(f){return f.mid===mid&&!f.paid})}
+function mstatus(m){
+  if(m.cancelled)return 'Cancelled';
+  if(m.expiry<today())return 'Expired';
+  if(unpaid(m.id).length)return 'Suspended';   /* REQ-04 */
+  return 'Active';
+}
+function note(m,type,text){DB.notes.unshift({when:today(),to:m.name+' ('+m.tel+')',type:type,text:text})}
+function eligible(m){
+  var s=mstatus(m);
+  return s==='Active'?null:'Card '+m.card+' ('+m.name+') is '+s.toLowerCase()+(s==='Suspended'?' because a fine is unpaid':'')+'.';
+}
+
+/* REQ-03 */
+function checkCard(c){
+  var m=byCard(c);if(!m)return bad('Card not recognised.');
+  var e=eligible(m);return e?bad(e):ok('Card valid: '+m.name+' ('+m.id+'), expires '+fmt(m.expiry)+'.');
+}
+/* REQ-09 to REQ-12 */
+function doBorrow(card,bc){
+  var m=byCard(card);if(!m)return bad('Card not recognised.');
+  var e=eligible(m);if(e)return bad(e);
+  var c=copy(bc);if(!c)return bad('No book copy with barcode '+String(bc||'').trim()+'.');
+  if(c.status==='On loan')return bad('That copy is already on loan.');
+  if(c.status==='Reserved'){
+    var r=DB.res.find(function(x){return x.copy===c.barcode&&x.status==='Notified'});
+    if(!r||r.mid!==m.id)return bad('That copy is being held for another member.');
+    r.status='Fulfilled';
+  }
+  var t=today(),due=addDays(t,LOAN_DAYS);
+  DB.loans.push({id:'L-'+(DB.loans.length+1),mid:m.id,bc:c.barcode,issue:t,due:due,ret:null,recall:''});
+  c.status='On loan';save();
+  return ok('Loan recorded: "'+book(c.isbn).title+'" (copy '+c.no+') to '+m.name+'. Stamp the return date on the book: '+fmt(due)+'.');
+}
+/* REQ-13 to REQ-16, REQ-23 */
+function doReturn(bc){
+  var c=copy(bc);if(!c)return bad('No book copy with barcode '+String(bc||'').trim()+'.');
+  var l=DB.loans.find(function(x){return x.bc===c.barcode&&!x.ret});
+  if(!l)return bad('That copy is not on loan.');
+  var t=today(),m=mem(l.mid),msg='Returned: "'+book(c.isbn).title+'" (copy '+c.no+') from '+m.name+'.';
+  l.ret=t;
+  if(t>l.due){
+    var d=diff(l.due,t),amt=d*FINE_PER_DAY;
+    var f={id:'F-'+(DB.fines.length+1),mid:m.id,lid:l.id,amt:amt,issued:t,paid:''};DB.fines.push(f);
+    note(m,'Fine notice','Book returned '+d+' day(s) late. Fine '+f.id+': '+amt+' RWF. Pay within '+CANCEL_DAYS+' days or your membership will be cancelled.');
+    msg+=' Late by '+d+' day(s): fine of '+amt+' RWF issued and notice sent. Borrowing is suspended until it is paid.';
+  }
+  var r=DB.res.find(function(x){return x.isbn===c.isbn&&x.status==='Waiting'});
+  if(r){
+    c.status='Reserved';r.status='Notified';r.copy=c.barcode;
+    note(mem(r.mid),'Availability','"'+book(c.isbn).title+'" is now available. It is held for you at the desk.');
+    msg+=' Copy held for '+mem(r.mid).name+', who has been notified.';
+  }else c.status='Available';
+  save();return ok(msg);
+}
+/* REQ-17 to REQ-19 */
+function doReserve(card,title,author){
+  var m=byCard(card);if(!m)return bad('Card not recognised.');
+  var e=eligible(m);if(e)return bad(e);
+  title=String(title||'').trim().toLowerCase();author=String(author||'').trim().toLowerCase();
+  if(!title)return bad('Enter the book title.');
+  var b=DB.books.find(function(x){return x.title.toLowerCase().indexOf(title)>=0&&x.author.toLowerCase().indexOf(author)>=0});
+  if(!b)return bad('No book matches that title and author.');
+  var av=DB.copies.find(function(c){return c.isbn===b.isbn&&c.status==='Available'});
+  if(av)return bad('A copy is on the shelf now (barcode '+av.barcode+'). Borrow it instead of reserving.');
+  if(DB.res.some(function(r){return r.mid===m.id&&r.isbn===b.isbn&&(r.status==='Waiting'||r.status==='Notified')}))return bad(m.name+' already has a reservation for this book.');
+  DB.res.push({id:'R-'+(DB.res.length+1),mid:m.id,isbn:b.isbn,date:today(),status:'Waiting',copy:''});save();
+  return ok('Reservation added for '+m.name+': "'+b.title+'" on '+fmt(today())+'.');
+}
+/* REQ-20, REQ-21 */
+function weekly(){
+  var n=0,t=today();DB.last=t;
+  var isbns=[];DB.res.forEach(function(r){if(r.status==='Waiting'&&isbns.indexOf(r.isbn)<0)isbns.push(r.isbn)});
+  isbns.forEach(function(isbn){
+    var bcs=DB.copies.filter(function(c){return c.isbn===isbn}).map(function(c){return c.barcode});
+    var ls=DB.loans.filter(function(l){return !l.ret&&bcs.indexOf(l.bc)>=0&&!(l.recall&&diff(l.recall,t)<WEEK)});
+    if(!ls.length)return;
+    ls.sort(function(a,b){return a.due<b.due?-1:1});
+    var l=ls[0];l.recall=t;
+    note(mem(l.mid),'Return request','Another member has reserved "'+book(isbn).title+'". Please return it as soon as you can.');n++;
+  });
+  return n;
+}
+/* REQ-05, REQ-25 and weekly trigger */
+function sweep(){
+  var t=today();
+  DB.fines.forEach(function(f){
+    if(!f.paid&&diff(f.issued,t)>=CANCEL_DAYS){
+      var m=mem(f.mid);
+      if(!m.cancelled){m.cancelled=true;note(m,'Membership','Membership cancelled: fine '+f.id+' was not paid within '+CANCEL_DAYS+' days.')}
+    }
+  });
+  if(diff(DB.last,t)>=WEEK)weekly();
+  save();
+}
+/* REQ-24 */
+function payFine(id){
+  var f=DB.fines.find(function(x){return x.id===id});if(!f||f.paid)return bad('Fine not found.');
+  var m=mem(f.mid);f.paid=today();
+  note(m,'Payment','Payment of '+f.amt+' RWF received for fine '+f.id+'.');save();
+  return ok('Fine '+f.id+' paid. '+(mstatus(m)==='Active'?'Borrowing privileges reinstated for '+m.name+'.':m.name+' is still '+mstatus(m).toLowerCase()+'.'));
+}
+function renew(id){
+  var m=mem(id);if(unpaid(id).length)return bad('Pay the outstanding fine first.');
+  m.cancelled=false;m.expiry=addDays(m.expiry>today()?m.expiry:today(),365);
+  note(m,'Membership','Membership renewed until '+fmt(m.expiry)+'.');save();return ok('Membership renewed for '+m.name+' until '+fmt(m.expiry)+'.');
+}
+//UI
+/* ===== Code 39 barcode (REQ-02) ===== */
+var C39={'0':'nnnwwnwnn','1':'wnnwnnnnw','2':'nnwwnnnnw','3':'wnwwnnnnn','4':'nnnwwnnnw','5':'wnnwwnnnn','6':'nnwwwnnnn','7':'nnnwnnwnw','8':'wnnwnnwnn','9':'nnwwnnwnn','B':'nnwnnwnnw','C':'wnwnnwnnn','-':'nwnnnnwnw','*':'nwnnwnwnn'};
+function barcode(text){
+  var s='*'+text+'*',x=0,r='';
+  for(var i=0;i<s.length;i++){
+    var p=C39[s[i]];if(!p)continue;
+    for(var j=0;j<9;j++){var w=p[j]==='w'?4:2;if(j%2===0)r+='<rect x="'+x+'" y="0" width="'+w+'" height="46" fill="#000"/>';x+=w}
+    x+=2;
+  }
+  return '<svg width="'+x+'" height="46" viewBox="0 0 '+x+' 46" role="img" aria-label="Barcode '+esc(text)+'">'+r+'</svg>';
+}
+function cardHTML(m){
+  return '<div class="card"><b>AUCA Library Card</b><div>'+esc(m.name)+'</div><div class="muted">'+esc(m.id)+' · valid '+fmt(m.start)+' to '+fmt(m.expiry)+'</div>'+barcode(m.card)+'<div class="mono" style="text-align:center;font-size:.8rem">'+esc(m.card)+'</div></div>';
+}
+
+/* ===== UI ===== */
+var S={page:'home',tab:'desk',res:{},showCard:null,foc:null,authenticated:false,studentId:''};
+var TABS=[['desk','Desk'],['members','Members'],['catalog','Catalog'],['records','Records']];
+function R(k){var r=S.res[k];return r?'<div class="res '+(r.ok?'ok':'err')+'" role="status">'+esc(r.text)+'</div>':''}
+function field(id,l,extra){return '<label for="'+id+'">'+l+'</label><input id="'+id+'" '+(extra||'')+'>'}
+
+function vDesk(){
+  return '<div class="grid">'+
+  '<div class="box"><h2>Borrow a book</h2><p class="sub">Scan the member card, then the book barcode.</p><form data-f="borrow">'+
+    field('bc','Membership card','class="mono" autocomplete="off" placeholder="C-1001"')+field('bb','Book barcode','class="mono" autocomplete="off" placeholder="BC-00001"')+
+    '<button class="btn">Issue book</button></form>'+R('borrow')+'</div>'+
+  '<div class="box"><h2>Return a book</h2><p class="sub">Scan the barcode of the returned copy.</p><form data-f="return">'+
+    field('rb','Book barcode','class="mono" autocomplete="off" placeholder="BC-00001"')+'<button class="btn">Return book</button></form>'+R('return')+'</div>'+
+  '<div class="box"><h2>Reserve a book</h2><p class="sub">Member card plus the title and author.</p><form data-f="reserve">'+
+    field('vc','Membership card','class="mono" autocomplete="off" placeholder="C-1002"')+field('vt','Title','autocomplete="off"')+field('va','Author','autocomplete="off"')+
+    '<button class="btn">Reserve</button></form>'+R('reserve')+'</div>'+
+  '<div class="box"><h2>Check a card</h2><p class="sub">Confirm a card is valid before a transaction.</p><form data-f="check">'+
+    field('cc','Membership card','class="mono" autocomplete="off" placeholder="C-1001"')+'<button class="btn o">Check card</button></form>'+R('check')+'</div></div>';
+}
+function vMembers(){
+  var t=today();
+  var h='<div class="grid"><div class="box"><h2>Register member</h2><p class="sub">A barcoded card is created automatically.</p><form data-f="member">'+
+    field('mn','Name','required')+field('ma','Address')+field('mt','Telephone','inputmode="tel"')+
+    '<div class="row2"><div>'+field('ms','Start date','type="date" value="'+t+'"')+'</div><div>'+field('me','Expiry date','type="date" value="'+addDays(t,365)+'"')+'</div></div>'+
+    '<button class="btn">Register and create card</button></form>'+R('member')+'</div>'+
+    '<div>'+(S.showCard&&mem(S.showCard)?'<p class="tag">Membership card (print or show on screen)</p>'+cardHTML(mem(S.showCard)):'<p class="muted">Register a member or press Card in the list to see the barcoded card.</p>')+'</div></div>'+
+    '<h2 class="sec">Members</h2>'+R('mem')+'<div class="tw"><table><tr><th>ID</th><th>Name</th><th>Card</th><th>Expires</th><th>Status</th><th>Unpaid fines</th><th></th></tr>';
+  DB.members.forEach(function(m){
+    var s=mstatus(m),u=unpaid(m.id).reduce(function(a,f){return a+f.amt},0);
+    h+='<tr><td>'+m.id+'</td><td>'+esc(m.name)+'</td><td class="mono">'+m.card+'</td><td>'+fmt(m.expiry)+'</td><td><span class="pill '+s+'">'+s+'</span></td><td>'+(u?u+' RWF':'-')+'</td><td><button class="btn s o" data-a="card" data-id="'+m.id+'">Card</button> '+
+      (s==='Expired'||s==='Cancelled'?'<button class="btn s" data-a="renew" data-id="'+m.id+'">Renew</button>':'')+'</td></tr>';
+  });
+  return h+'</table></div>';
+}
+function vCatalog(){
+  var h='<div class="box" style="max-width:520px"><h2>Register book</h2><p class="sub">Each copy gets its own copy number and barcode.</p><form data-f="book">'+
+    field('kt','Title','required')+field('ka','Author','required')+field('ki','ISBN','required')+
+    '<div class="row2"><div>'+field('kp','Publisher')+'</div><div>'+field('ky','Publication year','type="number" min="1400" max="2100"')+'</div></div>'+
+    field('kn','Number of copies','type="number" min="1" max="50" value="1"')+'<button class="btn">Add to catalog</button></form>'+R('book')+'</div>'+
+    '<h2 class="sec">Catalog</h2>'+R('cat');
+  DB.books.forEach(function(b){
+    h+='<div class="box" style="margin-bottom:.8rem"><h3>'+esc(b.title)+'</h3><p class="muted">'+esc(b.author)+' · ISBN '+esc(b.isbn)+' · '+esc(b.publisher||'')+' '+esc(b.year||'')+'</p><div class="tw"><table><tr><th>Copy</th><th>Barcode</th><th>Status</th></tr>';
+    DB.copies.filter(function(c){return c.isbn===b.isbn}).forEach(function(c){
+      h+='<tr><td>#'+c.no+'</td><td>'+barcode(c.barcode)+'<div class="mono muted">'+c.barcode+'</div></td><td><span class="pill '+(c.status==='On loan'?'onloan':c.status)+'">'+c.status+'</span></td></tr>';
+    });
+    h+='</table></div><button class="btn s o" style="margin-top:.6rem" data-a="copy" data-id="'+esc(b.isbn)+'">Add a copy</button></div>';
+  });
+  return h;
+}
+function vRecords(){
+  var t=today();
+  var h='<h2 class="sec">Fines</h2>'+R('fine')+'<div class="tw"><table><tr><th>Fine</th><th>Member</th><th>Amount</th><th>Issued</th><th>Status</th><th></th></tr>';
+  if(!DB.fines.length)h+='<tr><td colspan="6" class="muted">No fines yet.</td></tr>';
+  DB.fines.forEach(function(f){
+    var left=CANCEL_DAYS-diff(f.issued,t);
+    h+='<tr><td>'+f.id+'</td><td>'+esc(mem(f.mid).name)+'</td><td>'+f.amt+' RWF</td><td>'+fmt(f.issued)+'</td><td>'+
+      (f.paid?'<span class="pill Paid">Paid '+fmt(f.paid)+'</span>':'<span class="pill Unpaid">Unpaid</span> <span class="muted">'+(left>0?left+' day(s) until cancellation':'membership cancelled')+'</span>')+'</td><td>'+
+      (f.paid?'':'<button class="btn s" data-a="pay" data-id="'+f.id+'">Record payment</button>')+'</td></tr>';
+  });
+  h+='</table></div><h2 class="sec">Loans</h2><div class="tw"><table><tr><th>Loan</th><th>Member</th><th>Book</th><th>Issued</th><th>Due</th><th>Status</th></tr>';
+  if(!DB.loans.length)h+='<tr><td colspan="6" class="muted">No loans yet.</td></tr>';
+  DB.loans.slice().reverse().forEach(function(l){
+    var c=copy(l.bc),st=l.ret?'Returned '+fmt(l.ret):(t>l.due?'Overdue':'On loan');
+    h+='<tr><td>'+l.id+'</td><td>'+esc(mem(l.mid).name)+'</td><td>'+esc(book(c.isbn).title)+' <span class="muted">#'+c.no+'</span></td><td>'+fmt(l.issue)+'</td><td>'+fmt(l.due)+'</td><td>'+(st==='Overdue'?'<span class="pill Overdue">Overdue</span>':st)+'</td></tr>';
+  });
+  h+='</table></div><h2 class="sec">Reservations</h2><div class="tw"><table><tr><th>ID</th><th>Member</th><th>Book</th><th>Date</th><th>Status</th></tr>';
+  if(!DB.res.length)h+='<tr><td colspan="5" class="muted">No reservations yet.</td></tr>';
+  DB.res.forEach(function(r){h+='<tr><td>'+r.id+'</td><td>'+esc(mem(r.mid).name)+'</td><td>'+esc(book(r.isbn).title)+'</td><td>'+fmt(r.date)+'</td><td><span class="pill '+r.status+'">'+r.status+'</span></td></tr>'});
+  h+='</table></div><h2 class="sec">Weekly reservation scan</h2><p class="muted">Runs automatically every '+WEEK+' days. Last run: '+fmt(DB.last)+'.</p><button class="btn o" data-a="scan">Run scan now</button>'+R('scan')+
+    '<h2 class="sec">Notifications sent</h2><p class="muted">Simulated SMS and email messages.</p><div>';
+  if(!DB.notes.length)h+='<p class="muted">Nothing sent yet.</p>';
+  DB.notes.slice(0,40).forEach(function(n){h+='<div class="note"><span class="tag">'+esc(n.type)+' · '+fmt(n.when)+' · to '+esc(n.to)+'</span><br>'+esc(n.text)+'</div>'});
+  h+='</div><h2 class="sec">Messages from the Contact page</h2>';
+  if(!(DB.contacts||[]).length)h+='<p class="muted">No messages yet.</p>';
+  (DB.contacts||[]).slice().reverse().forEach(function(c){h+='<div class="note"><span class="tag">'+esc(c.topic)+' · '+fmt(c.when)+' · '+esc(c.name)+(c.via?' ('+esc(c.via)+')':'')+'</span><br>'+esc(c.text)+'</div>'});
+  return h+'<h2 class="sec">Demo data</h2><button class="btn o" data-a="reset">Reset to sample data</button>';
+}
+var CONTACT={email:'',phone:'',hours:''};   /* add the library's real details here */
+var SPINE=['#f2c14e','#e8e4d8','#2b9d82','#e0664b','#4f77aa','#98c1d9','#f4d58d','#c9503a'];
+function vHome(){
+  var av=DB.copies.filter(function(c){return c.status==='Available'}).length,ln=DB.loans.filter(function(l){return !l.ret}).length,sp='';
+  for(var i=0;i<16;i++)sp+='<i style="height:'+(95+((i*53)%115))+'px;background:'+SPINE[(i*3)%SPINE.length]+'"></i>';
+  var F=[['🪪','Barcoded member cards','Every member gets a card with a scannable barcode, checked on every transaction.'],
+   ['📚','Many copies, one title','Each copy has its own number, barcode and status: available, on loan or reserved.'],
+   ['⚡','Borrow and return in seconds','Scan the card, scan the book. The due date to stamp is worked out for you.'],
+   ['🔖','Reservations that follow up','Returned books are held for the next member, and borrowers are asked to return reserved titles.'],
+   ['💰','Fines handled automatically','Late returns create a fine, suspend borrowing, and lift it once paid.'],
+   ['🔔','Notices sent for you','Fine notices, return requests and availability alerts go out by SMS or email.']];
+  return '<section class="hero"><div><h1>Borrow, return and reserve with one scan.</h1><p>The AUCA library system replaces paper cards and handwritten ledgers with barcode scanning, so loans, reservations and fines are always up to date.</p>'+
+   '<div class="hbtn"><button class="btn gold" data-go="desk">Open the librarian desk</button><button class="btn ghost" data-page="about">How it works</button></div></div><div class="shelf" aria-hidden="true">'+sp+'</div></section>'+
+   '<div class="stats"><div class="stat"><b>'+DB.members.length+'</b><span>Members registered</span></div><div class="stat"><b>'+DB.books.length+'</b><span>Book titles</span></div>'+
+   '<div class="stat"><b>'+av+'</b><span>Copies on the shelf</span></div><div class="stat"><b>'+ln+'</b><span>Books on loan</span></div></div>'+
+   '<h2 class="h2">What the system does</h2><div class="feats">'+F.map(function(f){return '<div class="feat"><span class="ic" aria-hidden="true">'+f[0]+'</span><h3>'+f[1]+'</h3><p>'+f[2]+'</p></div>'}).join('')+'</div>'+
+   '<h2 class="h2">Jump to a task</h2><div class="hbtn" style="margin:0"><button class="btn" style="margin:0" data-go="desk">Borrow or return</button><button class="btn o" style="margin:0" data-go="members">Register a member</button><button class="btn o" style="margin:0" data-go="catalog">Add a book</button><button class="btn o" style="margin:0" data-go="records">See fines and loans</button></div>';
+}
+function vAbout(){
+  return '<h1 class="h2" style="margin-top:0">About the system</h1><div class="two"><div class="panel"><p>AUCA\'s library used to run on paper: members filled in cards by hand, loans and returns were written in a ledger, and reservations were kept on whatever list was nearest the desk. Reservations were easy to miss and fines easy to overlook.</p>'+
+   '<p>This system replaces that with barcode scanning of both membership cards and books. It keeps members, catalog, loans, reservations and fines in one place, and follows up automatically when a book is late or a reserved title is needed.</p>'+
+   '<p class="muted">Designed from the AUCA Library Management System requirements specification and UML analysis (25 requirements).</p></div>'+
+   '<div class="panel"><h3 style="margin-bottom:.4rem">How a loan works</h3><ol class="steps"><li>The librarian scans the member\'s card to check it is valid.</li><li>The librarian scans the book\'s barcode.</li><li>The system records the loan and works out the return date.</li><li>The librarian stamps that date on the book and hands both back.</li></ol></div></div>'+
+   '<h2 class="h2">Library rules used by the system</h2><div class="two"><div class="panel"><div class="tw"><table class="rules"><tr><td>Loan period</td><td>'+LOAN_DAYS+' days</td></tr><tr><td>Fine for a late book</td><td>'+FINE_PER_DAY+' RWF per day</td></tr><tr><td>Fine unpaid for</td><td>'+CANCEL_DAYS+' days: membership cancelled</td></tr><tr><td>Reservation check</td><td>Every '+WEEK+' days</td></tr></table></div></div>'+
+   '<div class="panel"><h3 style="margin-bottom:.4rem">Who uses it</h3><p><b>Librarian:</b> registers members and books, and runs loans, returns, reservations and fine payments.</p><p><b>Member:</b> borrows, returns and reserves books, and pays fines.</p><p class="muted">Behind the scenes: the barcode scanner, a weekly scheduler, and an SMS and email notification service.</p></div></div>';
+}
+function vContact(){
+  var info='',c=CONTACT;
+  if(c.email)info+='<p><b>Email:</b> '+esc(c.email)+'</p>';
+  if(c.phone)info+='<p><b>Phone:</b> '+esc(c.phone)+'</p>';
+  if(c.hours)info+='<p><b>Opening hours:</b> '+esc(c.hours)+'</p>';
+  if(!info)info='<p class="muted">The library\'s email, phone and opening hours will appear here once they are added.</p>';
+  return '<h1 class="h2" style="margin-top:0">Contact the library</h1><div class="two"><div class="panel"><h3 style="margin-bottom:.5rem">Visit or get in touch</h3><p>To register, borrow, return or reserve a book, visit the circulation desk at the AUCA library and bring your membership card.</p>'+info+
+   '<p class="muted">Questions about a fine, a reservation or your membership? Send a message and the library will reply.</p></div>'+
+   '<div class="panel"><h3>Send a message</h3><form data-f="contact">'+field('cn','Your name','required autocomplete="name"')+field('ce','Email or phone','autocomplete="email"')+
+   '<label for="cs">Topic</label><select id="cs"><option>Membership</option><option>Borrowing or returning</option><option>Reservation</option><option>Fine</option><option>Other</option></select>'+
+   '<label for="cm">Message</label><textarea id="cm" rows="4" style="width:100%;font:inherit;padding:.55rem .65rem;border:2px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)"></textarea>'+
+   '<button class="btn">Send message</button></form>'+R('contact')+'</div></div>';
+}
+function render(){
+  var header=document.querySelector('header'),sysbar=document.getElementById('sysbar'),main=document.querySelector('main'),footer=document.querySelector('footer');
+  if(!S.authenticated){
+    header.style.display='none';sysbar.style.display='none';footer.style.display='none';main.style.maxWidth='none';main.style.padding='0';
+    var login=document.getElementById('login-screen');
+    if(!login){login=document.createElement('div');login.id='login-screen';document.body.insertBefore(login,main);}
+    login.innerHTML='<section class="login-screen"><div class="login-card"><div class="login-mark" aria-hidden="true">📖</div><p class="tag">ADVENTIST UNIVERSITY OF CENTRAL AFRICA</p><h1>Welcome to AUCA Library</h1><p class="muted">Sign in with your student credentials to access the library system.</p><form data-f="student-login"><label for="student-id">Student ID</label><input id="student-id" name="studentId" autocomplete="username" placeholder="e.g. 20252SEN274" required><label for="student-password">Password</label><input id="student-password" name="password" type="password" autocomplete="current-password" placeholder="Enter your password" required><p id="login-error" class="login-error" role="alert"></p><button class="btn" type="submit">Sign in</button></form><p class="login-note">Prototype sign-in: this page checks that both fields are filled in. Connect it to AUCA authentication before using real student accounts.</p></div></section>';
+    login.style.display='block';return;
+  }
+  var login=document.getElementById('login-screen');if(login)login.style.display='none';
+  header.style.display='block';sysbar.style.display='block';footer.style.display='flex';main.style.maxWidth='1100px';main.style.padding='0 1rem 3rem';
+  var sys=S.page==='system';
+  document.getElementById('top').innerHTML='<span class="muted" style="color:var(--on);align-self:center;padding:0 .5rem">Student: '+esc(S.studentId)+'</span>'+[['home','Home'],['about','About'],['contact','Contact'],['system','Librarian desk']].map(function(t){
+    return '<button data-page="'+t[0]+'"'+(t[0]==='system'?' class="cta"':'')+(S.page===t[0]?' aria-current="page"':'')+'>'+t[1]+'</button>'}).join('')+'<button data-a="logout" class="logout-btn">Log out</button>';
+  document.getElementById('sysbar').style.display=sys?'block':'none';
+  var v=document.getElementById('view');v.className=sys?'pane':'free';
+  if(!sys){v.innerHTML={home:vHome,about:vAbout,contact:vContact}[S.page]();return}
+  renderSys();
+}
+function renderSys(){
+  document.getElementById('tabs').innerHTML=TABS.map(function(t){return '<button data-tab="'+t[0]+'"'+(S.tab===t[0]?' aria-current="page"':'')+'>'+t[1]+'</button>'}).join('');
+  document.getElementById('clock').innerHTML='<span>Library date: <b>'+fmt(today())+'</b>'+(DB.off?' (demo clock +'+DB.off+' days)':'')+'</span>'+
+    '<button data-a="day1">+1 day</button><button data-a="day7">+7 days</button><button data-a="day0">Real date</button>';
+  document.getElementById('view').innerHTML={desk:vDesk,members:vMembers,catalog:vCatalog,records:vRecords}[S.tab]();
+  if(S.foc){var e=document.getElementById(S.foc);if(e)e.focus();S.foc=null}
+}
+function val(id){return document.getElementById(id).value}
+document.addEventListener('submit',function(e){
+  e.preventDefault();var f=e.target.dataset.f;if(!f)return;sweep();
+  if(f==='student-login'){var sid=val('student-id').trim(),pw=val('student-password');if(!sid||!pw){var le=document.getElementById('login-error');if(le){le.textContent='Enter your student ID and password.';le.style.display='block'}return;}S.authenticated=true;S.studentId=sid;S.page='home';render();return;}
+  if(f==='borrow'){S.res.borrow=doBorrow(val('bc'),val('bb'));S.foc=S.res.borrow.ok?'bc':'bb'}
+  else if(f==='return'){S.res['return']=doReturn(val('rb'));S.foc='rb'}
+  else if(f==='reserve'){S.res.reserve=doReserve(val('vc'),val('vt'),val('va'))}
+  else if(f==='check'){S.res.check=checkCard(val('cc'))}
+  else if(f==='contact'){
+    if(!val('cn').trim()||!val('cm').trim())S.res.contact=bad('Enter your name and a message.');
+    else{DB.contacts=DB.contacts||[];DB.contacts.push({when:today(),name:val('cn').trim(),via:val('ce').trim(),topic:val('cs'),text:val('cm').trim()});save();S.res.contact=ok('Thank you, '+val('cn').trim().split(' ')[0]+'. Your message has been sent to the library.')}
+  }
+  else if(f==='member'){
+    var n=val('mn').trim();
+    if(!n||val('me')<=val('ms')){S.res.member=bad('Enter a name and an expiry date after the start date.')}
+    else{var m=addMember({name:n,address:val('ma').trim(),tel:val('mt').trim(),start:val('ms'),expiry:val('me')});save();S.showCard=m.id;S.res.member=ok('Member '+m.id+' registered. Card number '+m.card+'.')}
+  }else if(f==='book'){
+    var isbn=val('ki').trim(),cnt=Math.max(1,Math.min(50,parseInt(val('kn'),10)||1));
+    if(!val('kt').trim()||!val('ka').trim()||!isbn)S.res.book=bad('Title, author and ISBN are required.');
+    else if(book(isbn))S.res.book=bad('That ISBN is already in the catalog. Use Add a copy.');
+    else{addBook({title:val('kt').trim(),author:val('ka').trim(),isbn:isbn,publisher:val('kp').trim(),year:val('ky')},cnt);save();S.res.book=ok('Book added with '+cnt+' copy/copies.')}
+  }
+  render();
+});
+document.addEventListener('click',function(e){
+  var b=e.target.closest('button');if(!b)return;var d=b.dataset;
+  if(d.a==='logout'){S.authenticated=false;S.studentId='';S.page='home';S.tab='desk';S.res={};render();window.scrollTo(0,0);return;}
+  if(d.page){S.page=d.page;window.scrollTo(0,0)}
+  else if(d.go){S.page='system';S.tab=d.go;window.scrollTo(0,0)}
+  else if(d.tab){S.tab=d.tab;window.scrollTo(0,0)}
+  else if(d.a==='day1'||d.a==='day7'){DB.off=(DB.off||0)+(d.a==='day1'?1:7);sweep()}
+  else if(d.a==='day0'){DB.off=0;save()}
+  else if(d.a==='card'){S.showCard=d.id}
+  else if(d.a==='renew'){S.res.mem=renew(d.id)}
+  else if(d.a==='copy'){var c=addCopy(d.id);save();S.res.cat=ok('Copy #'+c.no+' added with barcode '+c.barcode+'.')}
+  else if(d.a==='pay'){S.res.fine=payFine(d.id)}
+  else if(d.a==='scan'){var n=weekly();save();S.res.scan=ok(n?n+' return request(s) sent.':'No return requests needed.')}
+  else if(d.a==='reset'){if(confirm('Replace all data with the sample data?')){S.res={};S.showCard=null;seed()}}
+  else return;
+  render();
+});
+load();sweep();render();
+</script>
+</body>
+</html>
